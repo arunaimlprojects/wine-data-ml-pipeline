@@ -19,10 +19,26 @@ y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print(f'Model Accuracy on Test Data: {accuracy * 100:.2f}%')
 
-# Print classification report
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
+# Classification Report
+class_report = classification_report(y_test, y_pred)
 
-# Print confusion matrix
+# Confusion Matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+# Print classification report and confusion matrix
+print("\nClassification Report:")
+print(class_report)
+
 print("\nConfusion Matrix:")
-print(confusion_matrix(y_test, y_pred))
+print(conf_matrix)
+
+# Save the evaluation results to a file
+output_file = 'data/evaluation_results/evaluation_metrics.txt'
+with open(output_file, 'w') as f:
+    f.write(f'Model Accuracy: {accuracy * 100:.2f}%\n\n')
+    f.write('Classification Report:\n')
+    f.write(class_report)
+    f.write('\nConfusion Matrix:\n')
+    f.write(str(conf_matrix))
+
+print(f"Evaluation results saved to '{output_file}'")
