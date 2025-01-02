@@ -1,8 +1,10 @@
 import pandas as pd
 import joblib
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.utils.multiclass import type_of_target
+import yaml
+import os
 
 # Load training and testing datasets
 train_data = pd.read_csv('data/feature_engineered/train_engineered.csv')
@@ -41,4 +43,19 @@ y_pred = model.predict(X_test)
 print("y_pred type after prediction:", type_of_target(y_pred))
 
 accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted')  # Or 'micro', 'macro' based on your needs
+recall = recall_score(y_test, y_pred, average='weighted')  # Same for recall
+
 print(f"Model Accuracy: {accuracy:.4f}")
+print(f"Model Precision: {precision:.4f}")
+print(f"Model Recall: {recall:.4f}")
+
+# Ensure output directory exists
+output_dir = 'data/evaluation_results'
+os.makedirs(output_dir, exist_ok=True)
+
+# Save metrics to evaluation_metrics.txt
+with open(os.path.join(output_dir, 'evaluation_metrics.txt'), 'w') as f:
+    f.write(f"Model Accuracy: {accuracy:.4f}\n")
+    f.write(f"Model Precision: {precision:.4f}\n")
+    f.write(f"Model Recall: {recall:.4f}\n")
