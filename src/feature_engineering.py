@@ -1,35 +1,31 @@
 import pandas as pd
-import os
+from sklearn.feature_selection import SelectKBest, f_classif
+import yaml
 
-# Define the paths (relative)
-train_path = 'data/preprocessed/train_preprocessed.csv'
-test_path = 'data/preprocessed/test_preprocessed.csv'
+# Load parameters from params.yaml
+with open('params.yaml') as f:
+    params = yaml.safe_load(f)
+
+# Fetch 'max_features' parameter
+max_features = params['feature_engineering']['max_features']
 
 # Load preprocessed data
-train_data = pd.read_csv(train_path)
-test_data = pd.read_csv(test_path)
+train_data = pd.read_csv('data/preprocessed/train_preprocessed.csv')
+test_data = pd.read_csv('data/preprocessed/test_preprocessed.csv')
 
-# Step 1: Feature Transformation (e.g., Log Transformation for skewed features)
-skewed_features = ['Malic.acid', 'Proline']  # Example features, make sure these are numeric
-for feature in skewed_features:
-    # Log transformation
-    train_data[feature] = train_data[feature].apply(lambda x: x if x <= 0 else x**0.5)
-    test_data[feature] = test_data[feature].apply(lambda x: x if x <= 0 else x**0.5)
+# Feature Engineering using SelectKBest
+X_train = train_data.drop('Wine', axis=1)
+y_train = train_data['Wine']
+X_test = test_data.drop('Wine', axis=1)
+y_test = test_data['Wine']
 
-# Step 2: Create Interaction Features (e.g., Product of two features)
-train_data['Alcohol_Proline'] = train_data['Alcohol'] * train_data['Proline']
-test_data['Alcohol_Proline'] = test_data['Alcohol'] * test_data['Proline']
+# Select best 'max_features'
+selector = SelectKBest(f_classif, k=max_features)
+X_train_selected = selector.fit_transform(X_train, y_train)
+X_test_selected = selector.transform(X_test)
 
-# Step 3: Feature Selection (dropping irrelevant features, if any)
-columns_to_drop = ['Ash']  # Example column, customize according to your analysis
-train_data.drop(columns=columns_to_drop, axis=1, inplace=True)
-test_data.drop(columns=columns_to_drop, axis=1, inplace=True)
+# Saving engineered data
+pd.DataFrame(X_train_selected).to_csv('data/feature_engineered/train_engineered.csv', index=False)
+pd.DataFrame(X_test_selected).to_csv('data/feature_engineered/test_engineered.csv', index=False)
 
-# Create the feature engineering folder
-os.makedirs('data/feature_engineered', exist_ok=True)
-
-# Save engineered data to the new folder
-train_data.to_csv('data/feature_engineered/train_engineered.csv', index=False)
-test_data.to_csv('data/feature_engineered/test_engineered.csv', index=False)
-
-print("Feature engineering completed. Engineered data saved in 'data/feature_engineered' folder.")
+print('Feature engineering completed.')

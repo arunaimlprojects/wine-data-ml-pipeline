@@ -1,22 +1,25 @@
 import pandas as pd
+import yaml
 from sklearn.model_selection import train_test_split
-import os
 
-# Load the dataset
-data = pd.read_csv('C:\\Users\\hp\\Desktop\\MLOPS-LEARNING\\wine-data-ml-pipeline\\my_data\\wine.csv')
+# Load parameters from params.yaml
+with open('params.yaml') as f:
+    params = yaml.safe_load(f)
 
-# Split the data into train and test
-train_data, test_data = train_test_split(data, test_size=0.2, random_state=42)
+# Fetch 'test_size' parameter
+test_size = params['data_ingestion']['test_size']
 
-# Create directories for train and test data inside 'data' folder
-os.makedirs('data/', exist_ok=True)  # If data folder doesn't exist, it will be created
+# Ingestion process
+df = pd.read_csv('my_data/wine.csv')
 
-# Create subfolders for train and test data
-os.makedirs('data/data_ingestion', exist_ok=True)
-os.makedirs('data/data_ingestion', exist_ok=True)
+# Split data
+X = df.drop('Wine', axis=1)
+y = df['Wine']
 
-# Save train and test data to CSV files
-train_data.to_csv('data/data_ingestion/train.csv', index=False)  # Save in specific folder
-test_data.to_csv('data/data_ingestion/test.csv', index=False)  # Save in specific folder
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
 
-print("Data ingestion completed. Train and test files saved in respective folders.")
+# Saving files
+X_train.to_csv('data/train_data/train.csv', index=False)
+X_test.to_csv('data/test_data/test.csv', index=False)
+
+print('Data ingestion completed.')

@@ -6,6 +6,8 @@ stages:
     outs:
       - data/train_data/train.csv
       - data/test_data/test.csv
+    params:
+      - data_ingestion.test_size
 
   data_preprocessing:
     cmd: python src/data_preprocessing.py
@@ -24,6 +26,8 @@ stages:
     outs:
       - data/feature_engineered/train_engineered.csv
       - data/feature_engineered/test_engineered.csv
+    params:
+      - feature_engineering.max_features
 
   model_training:
     cmd: python src/model_training.py
@@ -32,6 +36,9 @@ stages:
       - data/feature_engineered/test_engineered.csv
     outs:
       - data/models/random_forest_model.pkl
+    params:
+      - model_training.n_estimators
+      - model_training.random_state
 
   model_evaluation:
     cmd: python src/model_evaluation.py
@@ -39,5 +46,4 @@ stages:
       - data/models/random_forest_model.pkl
       - data/feature_engineered/test_engineered.csv
     outs:
-
       - data/evaluation_results/evaluation_metrics.txt

@@ -1,44 +1,41 @@
-import joblib
 import pandas as pd
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import joblib
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import LabelEncoder
+import os
 
-# Load the model
+# Make sure output directory exists
+output_dir = 'data/evaluation_results'
+os.makedirs(output_dir, exist_ok=True)
+
+# Load test dataset
+test_data = pd.read_csv('data/feature_engineered/test_engineered.csv')
+print("Columns in test_data:", test_data.columns)
+
+target_column = test_data.columns[0]
+y_test = test_data[target_column]
+X_test = test_data.drop(target_column, axis=1)
+
+# Load trained model
 model = joblib.load('data/models/random_forest_model.pkl')
 
-# Load the test data
-test_data = pd.read_csv('data/feature_engineered/test_engineered.csv')
-
-# Separate features and target
-X_test = test_data.drop('Wine', axis=1)
-y_test = test_data['Wine']
-
-# Make predictions
+# Predictions
 y_pred = model.predict(X_test)
 
-# Evaluate the model
+# Convert continuous to categorical if needed
+if y_test.dtypes != 'int64':
+    label_encoder = LabelEncoder()
+    y_test = label_encoder.fit_transform(y_test)
+
+if y_pred.dtype != 'int64':
+    y_pred = label_encoder.transform(y_pred)
+
+# Model Evaluation
 accuracy = accuracy_score(y_test, y_pred)
-print(f'Model Accuracy on Test Data: {accuracy * 100:.2f}%')
+print(f"Model Accuracy: {accuracy:.4f}")
 
-# Classification Report
-class_report = classification_report(y_test, y_pred)
-
-# Confusion Matrix
-conf_matrix = confusion_matrix(y_test, y_pred)
-
-# Print classification report and confusion matrix
-print("\nClassification Report:")
-print(class_report)
-
-print("\nConfusion Matrix:")
-print(conf_matrix)
-
-# Save the evaluation results to a file
-output_file = 'data/evaluation_results/evaluation_metrics.txt'
-with open(output_file, 'w') as f:
-    f.write(f'Model Accuracy: {accuracy * 100:.2f}%\n\n')
-    f.write('Classification Report:\n')
-    f.write(class_report)
-    f.write('\nConfusion Matrix:\n')
-    f.write(str(conf_matrix))
-
-print(f"Evaluation results saved to '{output_file}'")
+# Save metrics to text file
+with open(os.path.join(output_dir, 'evaluation_metrics.txt'), 'w') as f:
+    f.write(f"Model Accuracy: {accuracy:.4f}\n")
+    # You can add more metrics if needed:
+    # f.write(f"Other metric: {some_other_metric}\n")
