@@ -2,10 +2,11 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import os
 
-# Load train and test data
-train_path = 'C:\\Users\\hp\\Desktop\\MLOPS-LEARNING\\wine-data-ml-pipeline\\data\\train.csv'
-test_path = 'C:\\Users\\hp\\Desktop\\MLOPS-LEARNING\wine-data-ml-pipeline\\data\\test.csv'
+# Define the paths
+train_path = 'data/data_ingestion/train.csv'  # Use relative path
+test_path = 'data/data_ingestion/test.csv'  # Use relative path
 
+# Load train and test data
 train_data = pd.read_csv(train_path)
 test_data = pd.read_csv(test_path)
 
@@ -26,6 +27,7 @@ test_data[feature_columns] = scaler.transform(test_data[feature_columns])
 # Save preprocessed data back to disk
 os.makedirs('data/preprocessed', exist_ok=True)
 
+# Saving preprocessed data to respective folders
 train_data.to_csv('data/preprocessed/train_preprocessed.csv', index=False)
 test_data.to_csv('data/preprocessed/test_preprocessed.csv', index=False)
 

@@ -1,0 +1,18 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data_ingestion.py
+    deps:
+    - path: my_data/wine.csv
+      hash: md5
+      md5: afafdfdf205e62ad72b6168fd4caf003
+      size: 10890
+    outs:
+    - path: data/test_data/test.csv
+      hash: md5
+      md5: 58cdabcd08f63681f5cc4ae0bb719d10
+      size: 2438
+    - path: data/train_data/train.csv
+      hash: md5
+      md5: e412bc4d6c2afd0e5bdba668d800cdfe
+      size: 9330

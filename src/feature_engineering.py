@@ -1,16 +1,18 @@
 import pandas as pd
 import os
 
-# Load preprocessed data
+# Define the paths (relative)
 train_path = 'data/preprocessed/train_preprocessed.csv'
 test_path = 'data/preprocessed/test_preprocessed.csv'
 
+# Load preprocessed data
 train_data = pd.read_csv(train_path)
 test_data = pd.read_csv(test_path)
 
 # Step 1: Feature Transformation (e.g., Log Transformation for skewed features)
-skewed_features = ['Malic.acid', 'Proline']  # Example features
+skewed_features = ['Malic.acid', 'Proline']  # Example features, make sure these are numeric
 for feature in skewed_features:
+    # Log transformation
     train_data[feature] = train_data[feature].apply(lambda x: x if x <= 0 else x**0.5)
     test_data[feature] = test_data[feature].apply(lambda x: x if x <= 0 else x**0.5)
 
@@ -19,7 +21,7 @@ train_data['Alcohol_Proline'] = train_data['Alcohol'] * train_data['Proline']
 test_data['Alcohol_Proline'] = test_data['Alcohol'] * test_data['Proline']
 
 # Step 3: Feature Selection (dropping irrelevant features, if any)
-columns_to_drop = ['Ash']  # Example column
+columns_to_drop = ['Ash']  # Example column, customize according to your analysis
 train_data.drop(columns=columns_to_drop, axis=1, inplace=True)
 test_data.drop(columns=columns_to_drop, axis=1, inplace=True)
 

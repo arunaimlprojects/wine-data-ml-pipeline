@@ -1,54 +1,42 @@
 stages:
   data_ingestion:
-    cmd: python scripts/data_ingestion.py
+    cmd: python src/data_ingestion.py
     deps:
-      - data/train.csv
-      - data/test.csv
+      - my_data/wine.csv
     outs:
-      - data/feature_engineered/train_engineered.csv
-      - data/feature_engineered/test_engineered.csv
-    status:
-      - clean: true
+      - data/train_data/train.csv
+      - data/test_data/test.csv
 
   data_preprocessing:
-    cmd: python scripts/data_preprocessing.py
+    cmd: python src/data_preprocessing.py
     deps:
-      - data/feature_engineered/train_engineered.csv
-      - data/feature_engineered/test_engineered.csv
+      - data/train_data/train.csv
+      - data/test_data/test.csv
     outs:
       - data/preprocessed/train_preprocessed.csv
       - data/preprocessed/test_preprocessed.csv
-    status:
-      - clean: true
 
   feature_engineering:
-    cmd: python scripts/feature_engineering.py
+    cmd: python src/feature_engineering.py
     deps:
       - data/preprocessed/train_preprocessed.csv
       - data/preprocessed/test_preprocessed.csv
     outs:
       - data/feature_engineered/train_engineered.csv
       - data/feature_engineered/test_engineered.csv
-    status:
-      - clean: true
 
   model_training:
-    cmd: python scripts/model_training.py
+    cmd: python src/model_training.py
     deps:
       - data/feature_engineered/train_engineered.csv
       - data/feature_engineered/test_engineered.csv
     outs:
       - data/models/random_forest_model.pkl
-    status:
-      - clean: true
 
   model_evaluation:
-    cmd: python scripts/model_evaluation.py
+    cmd: python src/model_evaluation.py
     deps:
       - data/models/random_forest_model.pkl
       - data/feature_engineered/test_engineered.csv
     outs:
       - data/evaluation_results/evaluation_metrics.txt
-    status:
-      - clean: true
-
